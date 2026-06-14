@@ -1,0 +1,355 @@
+
+/* =========================
+   GLOBAL
+========================= */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2937;
+}
+
+/* =========================
+   NAVBAR (PRIMARY BLUE)
+========================= */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: #1d4ed8;
+    color: white;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    color: #dbeafe;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+.hero {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 90px 20px;
+    text-align: center;
+}
+
+.hero-content h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.hero-content p {
+    max-width: 700px;
+    margin: auto;
+    opacity: 0.95;
+}
+
+/* GET STARTED BUTTON (LIGHT BLUE CTA) */
+.btn-primary {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 26px;
+    background: #dbeafe;
+    color: #1e3a8a;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #bfdbfe;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+.section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.section.alt {
+    background: #eef2ff;
+}
+
+.section-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+/* =========================
+   WHY USE REFERNET (IMPACT CARDS)
+========================= */
+.intro-box {
+    max-width: 800px;
+    margin: 0 auto 30px;
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: left;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card h3 {
+    color: #1d4ed8;
+    margin-top: 0;
+}
+
+.feature-card p {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.feature-card.highlight {
+    border-left: 5px solid #3b82f6;
+}
+
+/* =========================
+   HOW IT WORKS (STEPS FLOW)
+========================= */
+.steps-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    max-width: 220px;
+}
+
+.circle {
+    width: 38px;
+    height: 38px;
+    background: #1d4ed8;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.step h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.step p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.arrow {
+    font-size: 22px;
+    color: #1d4ed8;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    background: #1d4ed8;
+    color: white;
+    text-align: center;
+    padding: 30px;
+    margin-top: 50px;
+}
+
+.footer .copyright {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+/* =========================
+   FORM LAYOUT (SIGNUP / SIGNIN)
+========================= */
+.form-section {
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 650px;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   FORM DESIGN
+========================= */
+.refernet-form h2 {
+    text-align: center;
+    color: #1d4ed8;
+    margin-bottom: 20px;
+}
+
+.form-block {
+    margin-bottom: 18px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+}
+
+.form-block h3 {
+    margin-top: 0;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.refernet-form label {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.refernet-form input,
+.refernet-form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    outline: none;
+}
+
+.refernet-form input:focus,
+.refernet-form select:focus {
+    border-color: #3b82f6;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.refernet-form button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.refernet-form button:hover {
+    background: #2563eb;
+}
+
+/* =========================
+   LINKS
+========================= */
+.refernet-form p {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.refernet-form a {
+    color: #1d4ed8;
+    text-decoration: none;
+}
+
+.refernet-form a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   ERROR BOX
+========================= */
+.error-box {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 768px) {
+
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .steps-container {
+        flex-direction: column;
+    }
+
+    .arrow {
+        transform: rotate(90deg);
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+}
