@@ -15,8 +15,15 @@ $Objlayout->nav($conf);
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="error-box" style="background:#dcfce7;color:#166534;">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
     <div class="form-card">
-        <?php $Objform->signup(); ?>
+        <?php $Objform->onboarding(); ?>
     </div>
 
 </section>

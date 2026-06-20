@@ -23,7 +23,7 @@ class layout
     }
 
     /* =========================
-        NAVBAR
+        NAVBAR (UPDATED AUTH FLOW)
     ========================= */
     public function nav($conf)
     {
@@ -42,6 +42,9 @@ class layout
                 <ul>
                     <li><a href="index.php">Home</a></li>
 
+                    <!-- anchor link -->
+                    <li><a href="#how-it-works">How It Works</a></li>
+
                     <?php if ($loggedIn): ?>
                         <?php if ($isAdmin): ?>
                             <li><a href="admin_dashboard.php">Dashboard</a></li>
@@ -51,8 +54,8 @@ class layout
                         <?php endif; ?>
                         <li><a href="signout.php">Logout</a></li>
                     <?php else: ?>
-                        <li><a href="signup.php">Sign Up</a></li>
-                        <li><a href="signin.php">Sign In</a></li>
+                        <!-- NO SIGN UP -->
+                        <li><a href="signin.php">Login</a></li>
                     <?php endif; ?>
                 </ul>
             </nav>
@@ -73,6 +76,8 @@ class layout
                 <p>
                     A hospital referral coordination system that improves communication,
                     tracking, and patient transfer efficiency between healthcare facilities.
+                    Clinical responsibility is maintained through doctor-initiated referrals,
+                    coordinated internally before being forwarded to receiving hospitals.
                 </p>
                 <a href="signin.php" class="btn-primary">Get Started</a>
             </div>
@@ -81,15 +86,13 @@ class layout
     }
 
     /* =========================
-        WHY USE REFERNET (IMPACT ONLY)
+        WHY USE REFERNET
     ========================= */
     public function why_use_system($conf)
     {
         ?>
         <section class="section">
             <h2 class="section-title">Why Use <?php echo $conf['site_name']; ?>?</h2>
-
-        
 
             <div class="feature-grid">
 
@@ -105,7 +108,7 @@ class layout
 
                 <div class="feature-card highlight">
                     <h3>Better Communication</h3>
-                    <p>Standardized digital communication between referring and receiving hospitals.</p>
+                    <p>Standardized communication between hospitals and coordinators.</p>
                 </div>
 
                 <div class="feature-card highlight">
@@ -115,12 +118,20 @@ class layout
 
                 <div class="feature-card highlight">
                     <h3>Real-Time Tracking</h3>
-                    <p>Allows hospitals to monitor referral status from submission to completion.</p>
+                    <p>Monitor referral status from submission to completion.</p>
                 </div>
 
                 <div class="feature-card highlight">
                     <h3>Improved Efficiency</h3>
-                    <p>Removes reliance on paper-based systems and manual coordination.</p>
+                    <p>Removes paper-based processes and manual coordination delays.</p>
+                </div>
+
+                <div class="feature-card highlight">
+                    <h3>Maintains Clinical Responsibility</h3>
+                    <p>
+                        Doctors initiate referrals based on clinical assessment, while coordinators
+                        manage routing and communication between facilities.
+                    </p>
                 </div>
 
             </div>
@@ -129,12 +140,13 @@ class layout
     }
 
     /* =========================
-        HOW IT WORKS
+        HOW IT WORKS (UNCHANGED EXACTLY)
     ========================= */
     public function how_to_use($conf)
     {
         ?>
-        <section class="section alt">
+        <section class="section alt" id="how-it-works">
+
             <h2 class="section-title">How It Works</h2>
 
             <div class="steps-container">
@@ -142,8 +154,11 @@ class layout
                 <div class="step">
                     <div class="circle">1</div>
                     <div>
-                        <h3>Sign In</h3>
-                        <p>Secure access for hospital staff.</p>
+                        <h3>Doctor Creates Referral</h3>
+                        <p>
+                            The doctor evaluates the patient and submits a clinical referral with diagnosis,
+                            notes, and required level of care.
+                        </p>
                     </div>
                 </div>
 
@@ -152,8 +167,11 @@ class layout
                 <div class="step">
                     <div class="circle">2</div>
                     <div>
-                        <h3>Create Referral</h3>
-                        <p>Enter patient and clinical details.</p>
+                        <h3>Internal Referral Coordinator Review</h3>
+                        <p>
+                            The referral coordinator checks completeness, validates details,
+                            and prepares the referral for forwarding.
+                        </p>
                     </div>
                 </div>
 
@@ -162,8 +180,10 @@ class layout
                 <div class="step">
                     <div class="circle">3</div>
                     <div>
-                        <h3>Review</h3>
-                        <p>Hospital approves or rejects referral.</p>
+                        <h3>Forward to Receiving Hospital</h3>
+                        <p>
+                            The referral is securely sent to the receiving hospital’s referral coordinator.
+                        </p>
                     </div>
                 </div>
 
@@ -172,8 +192,11 @@ class layout
                 <div class="step">
                     <div class="circle">4</div>
                     <div>
-                        <h3>Schedule</h3>
-                        <p>Appointments created for approved cases.</p>
+                        <h3>Receiving Coordinator Review</h3>
+                        <p>
+                            The receiving coordinator checks capacity and clinical suitability,
+                            then responds with acceptance or rejection.
+                        </p>
                     </div>
                 </div>
 
@@ -182,8 +205,22 @@ class layout
                 <div class="step">
                     <div class="circle">5</div>
                     <div>
-                        <h3>Track</h3>
-                        <p>Real-time status updates & notifications.</p>
+                        <h3>Scheduling & Transfer</h3>
+                        <p>
+                            If accepted, an appointment or transfer is scheduled and confirmed.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="step">
+                    <div class="circle">6</div>
+                    <div>
+                        <h3>Tracking & Completion</h3>
+                        <p>
+                            All stakeholders can track the referral until the patient transfer is completed.
+                        </p>
                     </div>
                 </div>
 
