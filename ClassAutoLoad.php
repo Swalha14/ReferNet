@@ -25,4 +25,5 @@ $SQL = new dbConnection($conf['db_type'], $conf['db_host'], $conf['db_name'], $c
 // Create instances
 $Objform   = new Forms();
 $Objlayout = new layout();
-//$ObjSendMail= new SendMail();
+$ObjSendMail= new SendMail($conf);
+$ObjAuth = new Auth($SQL->getConnection(), $conf);
