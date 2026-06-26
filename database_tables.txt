@@ -1,0 +1,183 @@
+-- ============================================================
+--  ReferNet Database Schema
+--  Run this in phpMyAdmin or MySQL CLI
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS refernet
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE refernet;
+
+-- ============================================================
+--  1. HOSPITAL
+-- ============================================================
+CREATE TABLE IF NOT EXISTS hospital (
+    hospital_id   INT AUTO_INCREMENT PRIMARY KEY,
+    hospital_name VARCHAR(150) NOT NULL,
+    county        VARCHAR(100) NOT NULL,
+    level         VARCHAR(50)  NOT NULL,   -- e.g. Level 4, Level 5, Level 6
+    location      VARCHAR(150),
+    email         VARCHAR(150),
+    phone         VARCHAR(20),
+    is_active     BOOLEAN     DEFAULT TRUE,
+    created_at    DATETIME    DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+--  2. USER  (doctors + coordinators — pre-seeded, no sign-up)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user (
+    user_id       INT AUTO_INCREMENT PRIMARY KEY,
+    hospital_id   INT          NOT NULL,
+    full_name     VARCHAR(150) NOT NULL,
+    email         VARCHAR(150) NOT NULL UNIQUE,
+    password      VARCHAR(255) NOT NULL,   -- bcrypt hashed
+    role          ENUM('doctor','coordinator') NOT NULL,
+    department    VARCHAR(100),
+    phone         VARCHAR(20),
+    is_active     BOOLEAN      DEFAULT TRUE,
+    created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (hospital_id) REFERENCES hospital(hospital_id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- ============================================================
+--  3. OTP  (one active OTP per user at a time)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS otp (
+    otp_id      INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT         NOT NULL,
+    otp_code    VARCHAR(6)  NOT NULL,
+    expires_at  DATETIME    NOT NULL,
+    used        BOOLEAN     DEFAULT FALSE,
+    created_at  DATETIME    DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- ============================================================
+--  4. PATIENT
+-- ============================================================
+CREATE TABLE IF NOT EXISTS patient (
+    patient_id    INT AUTO_INCREMENT PRIMARY KEY,
+    full_name     VARCHAR(150) NOT NULL,
+    gender        ENUM('Male','Female','Other') NOT NULL,
+    date_of_birth DATE         NOT NULL,
+    national_id   VARCHAR(20)  NOT NULL UNIQUE,
+    phone_number  VARCHAR(20),
+    address       VARCHAR(255),
+    current_ward  VARCHAR(100),
+    created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+--  5. REFERRAL
+-- ============================================================
+CREATE TABLE IF NOT EXISTS referral (
+    referral_id              INT AUTO_INCREMENT PRIMARY KEY,
+    referral_date            DATETIME    DEFAULT CURRENT_TIMESTAMP,
+
+    -- clinical info
+    diagnosis                VARCHAR(255) NOT NULL,
+    referral_reason          TEXT         NOT NULL,
+    urgency_level            ENUM('Low','Medium','High','Critical') NOT NULL,
+    examination_findings     TEXT,
+    treatment_given          TEXT,
+    clinical_summary         TEXT,
+
+    -- status tracking
+    status                   ENUM(
+                                 'Pending Validation',
+                                 'Submitted',
+                                 'Approved',
+                                 'Rejected',
+                                 'Scheduled',
+                                 'Completed'
+                             ) NOT NULL DEFAULT 'Pending Validation',
+
+    review_notes             TEXT,        -- coordinator notes on forward/reject
+    decision_date            DATETIME,    -- when receiving coord made decision
+
+    -- foreign keys
+    patient_id               INT NOT NULL,
+    doctor_id                INT NOT NULL,
+    referring_coordinator_id INT,         -- set when referring coord forwards
+    receiving_coordinator_id INT,         -- set when receiving coord accepts/rejects
+    sending_hospital_id      INT NOT NULL,
+    receiving_hospital_id    INT NOT NULL,
+
+    FOREIGN KEY (patient_id)               REFERENCES patient(patient_id),
+    FOREIGN KEY (doctor_id)                REFERENCES user(user_id),
+    FOREIGN KEY (referring_coordinator_id) REFERENCES user(user_id),
+    FOREIGN KEY (receiving_coordinator_id) REFERENCES user(user_id),
+    FOREIGN KEY (sending_hospital_id)      REFERENCES hospital(hospital_id),
+    FOREIGN KEY (receiving_hospital_id)    REFERENCES hospital(hospital_id)
+);
+
+-- ============================================================
+--  6. APPOINTMENT  (created when referral is Approved)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS appointment (
+    appointment_id   INT AUTO_INCREMENT PRIMARY KEY,
+    referral_id      INT      NOT NULL UNIQUE,   -- one appointment per referral
+    appointment_date DATE     NOT NULL,
+    appointment_time TIME     NOT NULL,
+    department       VARCHAR(100),
+    notes            TEXT,
+    status           ENUM('Scheduled','Completed','Cancelled') DEFAULT 'Scheduled',
+    booked_by        INT      NOT NULL,           -- user_id of receiving coordinator
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (referral_id) REFERENCES referral(referral_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (booked_by)   REFERENCES user(user_id)
+);
+
+-- ============================================================
+--  7. NOTIFICATION
+-- ============================================================
+CREATE TABLE IF NOT EXISTS notification (
+    notification_id   INT AUTO_INCREMENT PRIMARY KEY,
+    user_id           INT          NOT NULL,
+    referral_id       INT,
+    message           TEXT         NOT NULL,
+    notification_type VARCHAR(50),             -- e.g. 'new_referral','approved','rejected'
+    is_read           BOOLEAN      DEFAULT FALSE,
+    sent_at           DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id)     REFERENCES user(user_id)   ON DELETE CASCADE,
+    FOREIGN KEY (referral_id) REFERENCES referral(referral_id) ON DELETE SET NULL
+);
+
+-- ============================================================
+--  SEED DATA
+-- ============================================================
+
+-- Hospitals
+INSERT INTO hospital (hospital_name, county, level, location, email, phone) VALUES
+('Kenyatta National Hospital',    'Nairobi', 'Level 6', 'Upper Hill, Nairobi',       'info@knh.or.ke',       '+254 20 272 6300'),
+('Nairobi West Hospital',         'Nairobi', 'Level 5', 'Mutuini, Nairobi',          'info@nairobiwest.com',  '+254 20 890 0000'),
+('Aga Khan University Hospital',  'Nairobi', 'Level 6', '3rd Parklands Ave, Nairobi','info@agakhan.org',      '+254 20 366 2000'),
+('Kenyatta University Hospital',  'Nairobi', 'Level 5', 'Kahawa, Nairobi',           'info@kuh.ac.ke',        '+254 20 870 0000'),
+('Strathmore University Medical', 'Nairobi', 'Level 2', 'Madaraka, Nairobi',         'clinic@strathmore.edu', '+254 20 606 1000');
+
+-- Users  (passwords are bcrypt of 'password123' — change before go-live)
+INSERT INTO user (hospital_id, full_name, email, password, role, department, phone) VALUES
+-- Doctors
+(5, 'Dr. John Mwangi',   'john.mwangi@strathmore.edu',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'General Practice', '+254 711 000001'),
+(5, 'Dr. Amina Hassan',  'amina.hassan@strathmore.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Cardiology',       '+254 711 000002'),
+(1, 'Dr. Peter Otieno',  'peter.otieno@knh.or.ke',      '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Pediatrics',       '+254 711 000003'),
+(2, 'Dr. Grace Wanjiku', 'grace.wanjiku@nairobiwest.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Surgery',          '+254 711 000004'),
+
+-- Coordinators
+(5, 'Jane Wanjiku',      'jane.wanjiku@strathmore.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000001'),
+(1, 'James Ouma',        'james.ouma@knh.or.ke',        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000002'),
+(2, 'Mary Achieng',      'mary.achieng@nairobiwest.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000003'),
+(3, 'Samuel Kariuki',    'samuel.kariuki@agakhan.org',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000004');
+
+-- Sample Patients
+INSERT INTO patient (full_name, gender, date_of_birth, national_id, phone_number, address, current_ward) VALUES
+('Peter Kimani',   'Male',   '1979-03-15', '12345678', '+254 700 111 001', 'Westlands, Nairobi',  'General Ward'),
+('Mary Wanjiku',   'Female', '1990-07-22', '23456789', '+254 700 111 002', 'Kibera, Nairobi',     'Female Ward'),
+('James Ouma',     'Male',   '1985-11-10', '34567890', '+254 700 111 003', 'Eastleigh, Nairobi',  'General Ward'),
+('Grace Achieng',  'Female', '2001-05-03', '45678901', '+254 700 111 004', 'Karen, Nairobi',      'Maternity'),
+('Daniel Kipchoge','Male',   '1972-09-28', '56789012', '+254 700 111 005', 'Langata, Nairobi',    'ICU');
