@@ -66,7 +66,7 @@ function urgencyBadge(string $urgency): string {
                 border-radius:20px;font-size:12px;font-weight:bold;'>{$urgency}</span>";
 }
 
-$Objlayout->header($conf);
+$Objlayout->header($conf, '../');
 ?>
 
 <div style="display:flex;min-height:100vh;font-family:Arial,sans-serif;">

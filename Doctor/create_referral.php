@@ -29,7 +29,7 @@ $stmt = $conn->prepare(
 $stmt->execute();
 $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$Objlayout->header($conf);
+$Objlayout->header($conf, '../');
 ?>
 
 <div style="display:flex;min-height:100vh;font-family:Arial,sans-serif;">
@@ -87,9 +87,21 @@ $Objlayout->header($conf);
                 <?= htmlspecialchars($_SESSION['department']) ?>
             </div>
             <a href="../signout.php"
-               style="color:#bfdbfe;font-size:12px;text-decoration:none;">
+               style="
+                    display:block;
+                    margin-top:18px;
+                    padding:12px;
+                    background:#dc2626;
+                    color:white;
+                    text-align:center;
+                    text-decoration:none;
+                    border-radius:8px;
+                    font-weight:bold;
+                    font-size:15px;
+                    box-shadow:0 2px 6px rgba(0,0,0,.2);">
                 🚪 Logout
             </a>
+        </div>
         </div>
     </aside>
 

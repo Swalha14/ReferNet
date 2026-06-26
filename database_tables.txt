@@ -163,16 +163,10 @@ INSERT INTO hospital (hospital_name, county, level, location, email, phone) VALU
 -- Users  (passwords are bcrypt of 'password123' — change before go-live)
 INSERT INTO user (hospital_id, full_name, email, password, role, department, phone) VALUES
 -- Doctors
-(5, 'Dr. John Mwangi',   'john.mwangi@strathmore.edu',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'General Practice', '+254 711 000001'),
-(5, 'Dr. Amina Hassan',  'amina.hassan@strathmore.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Cardiology',       '+254 711 000002'),
-(1, 'Dr. Peter Otieno',  'peter.otieno@knh.or.ke',      '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Pediatrics',       '+254 711 000003'),
-(2, 'Dr. Grace Wanjiku', 'grace.wanjiku@nairobiwest.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'doctor',      'Surgery',          '+254 711 000004'),
+(5, 'Dr. John Mwangi',   'john.mwangi@strathmore.edu',  '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K', 'doctor',      'General Practice', '+254 711 000001'),
 
 -- Coordinators
-(5, 'Jane Wanjiku',      'jane.wanjiku@strathmore.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000001'),
-(1, 'James Ouma',        'james.ouma@knh.or.ke',        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000002'),
-(2, 'Mary Achieng',      'mary.achieng@nairobiwest.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000003'),
-(3, 'Samuel Kariuki',    'samuel.kariuki@agakhan.org',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'coordinator', 'Referral Desk',    '+254 722 000004');
+(5, 'Jane Wanjiku',      'jane.wanjiku@strathmore.edu', '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K', 'coordinator', 'Referral Desk',    '+254 722 000001'),
 
 -- Sample Patients
 INSERT INTO patient (full_name, gender, date_of_birth, national_id, phone_number, address, current_ward) VALUES

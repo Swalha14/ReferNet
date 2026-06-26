@@ -5,22 +5,22 @@ class layout
     /* =========================
         HEADER
     ========================= */
-    public function header($conf)
-    {
-        ?>
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title><?php echo $conf['site_name']; ?></title>
+    public function header($conf, $path = '')
+{
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><?php echo $conf['site_name']; ?></title>
 
-            <link rel="stylesheet" href="CSS/style.css">
-            <script src="JS/script.js" defer></script>
-        </head>
-        <body>
-        <?php
-    }
+        <link rel="stylesheet" href="<?= $path ?>CSS/style.css">
+        <script src="<?= $path ?>JS/script.js" defer></script>
+    </head>
+    <body>
+    <?php
+}
 
     /* =========================
         NAVBAR (UPDATED AUTH FLOW)
