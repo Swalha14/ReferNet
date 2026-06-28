@@ -102,7 +102,6 @@ $Objlayout->header($conf, '../');
                 🚪 Logout
             </a>
         </div>
-        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
