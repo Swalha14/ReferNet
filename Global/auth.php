@@ -161,24 +161,19 @@ class Auth
     }
 
     /* ==============================================
-   Change password after first login
-============================================== */
-public function changePassword(int $userId, string $newPassword): bool
-{
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-
-    $stmt = $this->conn->prepare(
-        "UPDATE user
-         SET password = :password,
-             password_changed = 1
-         WHERE user_id = :id"
-    );
-
-    return $stmt->execute([
-        ':password' => $hashedPassword,
-        ':id'       => $userId
-    ]);
-}
+       Change password — called on first login
+    =============================================== */
+    public function changePassword(int $userId, string $newPassword): bool
+    {
+        $hash = password_hash($newPassword, PASSWORD_BCRYPT);
+        $stmt = $this->conn->prepare(
+            "UPDATE user
+             SET password = :hash, password_changed = 1
+             WHERE user_id = :uid"
+        );
+        $stmt->execute([':hash' => $hash, ':uid' => $userId]);
+        return $stmt->rowCount() > 0;
+    }
 
     /* ==============================================
        Destroy session (logout)
