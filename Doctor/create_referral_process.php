@@ -2,11 +2,9 @@
 session_start();
 require_once '../ClassAutoLoad.php';
 
-// Guard
 $ObjAuth->requireLogin();
 $ObjAuth->requireRole('doctor');
 
-// Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: create_referral.php');
     exit;
@@ -16,25 +14,38 @@ $conn       = $SQL->getConnection();
 $userId     = $_SESSION['user_id'];
 $hospitalId = $_SESSION['hospital_id'];
 
-// Sanitise inputs
-$patientId           = (int) ($_POST['patient_id']           ?? 0);
-$receivingHospitalId = (int) ($_POST['receiving_hospital_id'] ?? 0);
-$diagnosis           = trim($_POST['diagnosis']           ?? '');
-$referralReason      = trim($_POST['referral_reason']     ?? '');
-$urgencyLevel        = trim($_POST['urgency_level']       ?? '');
-$examinationFindings = trim($_POST['examination_findings'] ?? '');
-$treatmentGiven      = trim($_POST['treatment_given']     ?? '');
-$clinicalSummary     = trim($_POST['clinical_summary']    ?? '');
+// --- Patient inputs ---
+$fullName            = trim($_POST['full_name']       ?? '');
+$nationalId          = trim($_POST['national_id']     ?? '');
+$gender              = trim($_POST['gender']          ?? '');
+$dateOfBirth         = trim($_POST['date_of_birth']   ?? '');
+$phoneNumber         = trim($_POST['phone_number']    ?? '');
+$patientEmail        = trim($_POST['patient_email']   ?? '');
+$currentWard         = trim($_POST['current_ward']    ?? '');
+$address             = trim($_POST['address']         ?? '');
 
-// Validation
-if (!$patientId || !$receivingHospitalId || !$diagnosis ||
-    !$referralReason || !$urgencyLevel || !$clinicalSummary) {
-    $_SESSION['error'] = 'Please fill in all required fields.';
+// --- Referral inputs ---
+$receivingHospitalId = (int)($_POST['receiving_hospital_id'] ?? 0);
+$diagnosis           = trim($_POST['diagnosis']            ?? '');
+$referralReason      = trim($_POST['referral_reason']      ?? '');
+$urgencyLevel        = trim($_POST['urgency_level']        ?? '');
+$examinationFindings = trim($_POST['examination_findings'] ?? '');
+$treatmentGiven      = trim($_POST['treatment_given']      ?? '');
+$clinicalSummary     = trim($_POST['clinical_summary']     ?? '');
+
+// --- Validation ---
+if (!$fullName || !$nationalId || !$gender || !$dateOfBirth) {
+    $_SESSION['error'] = 'Please fill in all required patient fields.';
     header('Location: create_referral.php');
     exit;
 }
 
-// Validate urgency level
+if (!$receivingHospitalId || !$diagnosis || !$referralReason || !$urgencyLevel || !$clinicalSummary) {
+    $_SESSION['error'] = 'Please fill in all required clinical fields.';
+    header('Location: create_referral.php');
+    exit;
+}
+
 $validUrgency = ['Low', 'Medium', 'High', 'Critical'];
 if (!in_array($urgencyLevel, $validUrgency)) {
     $_SESSION['error'] = 'Invalid urgency level selected.';
@@ -42,14 +53,44 @@ if (!in_array($urgencyLevel, $validUrgency)) {
     exit;
 }
 
-// Ensure receiving hospital is not the same as sending hospital
 if ($receivingHospitalId === $hospitalId) {
     $_SESSION['error'] = 'Cannot refer a patient to your own hospital.';
     header('Location: create_referral.php');
     exit;
 }
 
-// Insert referral into DB
+// --- Patient: check if national ID already exists ---
+$stmt = $conn->prepare("SELECT patient_id FROM patient WHERE national_id = :nid LIMIT 1");
+$stmt->execute([':nid' => $nationalId]);
+$existingPatient = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($existingPatient) {
+    // Use existing patient record and warn the doctor
+    $patientId = $existingPatient['patient_id'];
+    $duplicateWarning = "A patient with National ID {$nationalId} already exists in the system. Their existing record has been used for this referral.";
+} else {
+    // Insert new patient
+    $stmt = $conn->prepare(
+        "INSERT INTO patient (full_name, gender, date_of_birth, national_id,
+                              phone_number, email, address, current_ward)
+         VALUES (:full_name, :gender, :dob, :nid,
+                 :phone, :email, :address, :ward)"
+    );
+    $stmt->execute([
+        ':full_name' => $fullName,
+        ':gender'    => $gender,
+        ':dob'       => $dateOfBirth,
+        ':nid'       => $nationalId,
+        ':phone'     => $phoneNumber ?: null,
+        ':email'     => $patientEmail ?: null,
+        ':address'   => $address      ?: null,
+        ':ward'      => $currentWard  ?: null,
+    ]);
+    $patientId        = $conn->lastInsertId();
+    $duplicateWarning = null;
+}
+
+// --- Insert Referral ---
 $stmt = $conn->prepare(
     "INSERT INTO referral (
         patient_id, doctor_id, sending_hospital_id, receiving_hospital_id,
@@ -57,35 +98,27 @@ $stmt = $conn->prepare(
         examination_findings, treatment_given, clinical_summary,
         status, referral_date
     ) VALUES (
-        :patient_id, :doctor_id, :sending_hospital_id, :receiving_hospital_id,
+        :patient_id, :doctor_id, :sending_hid, :receiving_hid,
         :diagnosis, :referral_reason, :urgency_level,
-        :examination_findings, :treatment_given, :clinical_summary,
+        :exam_findings, :treatment, :clinical_summary,
         'Pending Validation', NOW()
     )"
 );
-
 $stmt->execute([
-    ':patient_id'            => $patientId,
-    ':doctor_id'             => $userId,
-    ':sending_hospital_id'   => $hospitalId,
-    ':receiving_hospital_id' => $receivingHospitalId,
-    ':diagnosis'             => $diagnosis,
-    ':referral_reason'       => $referralReason,
-    ':urgency_level'         => $urgencyLevel,
-    ':examination_findings'  => $examinationFindings,
-    ':treatment_given'       => $treatmentGiven,
-    ':clinical_summary'      => $clinicalSummary,
+    ':patient_id'       => $patientId,
+    ':doctor_id'        => $userId,
+    ':sending_hid'      => $hospitalId,
+    ':receiving_hid'    => $receivingHospitalId,
+    ':diagnosis'        => $diagnosis,
+    ':referral_reason'  => $referralReason,
+    ':urgency_level'    => $urgencyLevel,
+    ':exam_findings'    => $examinationFindings ?: null,
+    ':treatment'        => $treatmentGiven      ?: null,
+    ':clinical_summary' => $clinicalSummary,
 ]);
-
 $referralId = $conn->lastInsertId();
 
-// Fetch patient name for notification message
-$stmt = $conn->prepare("SELECT full_name FROM patient WHERE patient_id = :pid");
-$stmt->execute([':pid' => $patientId]);
-$patient = $stmt->fetch(PDO::FETCH_ASSOC);
-$patientName = $patient['full_name'] ?? 'Unknown Patient';
-
-// Fetch coordinator(s) at the same hospital
+// --- Notify coordinators at this hospital (in-system) ---
 $stmt = $conn->prepare(
     "SELECT user_id, full_name, email FROM user
      WHERE hospital_id = :hid AND role = 'coordinator' AND is_active = 1"
@@ -93,26 +126,18 @@ $stmt = $conn->prepare(
 $stmt->execute([':hid' => $hospitalId]);
 $coordinators = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Notify each coordinator at this hospital via DB notification
 foreach ($coordinators as $coord) {
-    $message = "New referral submitted by {$_SESSION['full_name']} for patient {$patientName}. "
+    $message = "New referral submitted by {$_SESSION['full_name']} for patient {$fullName}. "
              . "Diagnosis: {$diagnosis}. Urgency: {$urgencyLevel}. Please review.";
 
     $stmt = $conn->prepare(
         "INSERT INTO notification (user_id, referral_id, message, notification_type, is_read, sent_at)
          VALUES (:uid, :rid, :msg, 'new_referral', 0, NOW())"
     );
-    $stmt->execute([
-        ':uid' => $coord['user_id'],
-        ':rid' => $referralId,
-        ':msg' => $message,
-    ]);
+    $stmt->execute([':uid' => $coord['user_id'], ':rid' => $referralId, ':msg' => $message]);
 }
 
-// Also notify the doctor themselves (confirmation)
-$doctorMessage = "Your referral for patient {$patientName} (Diagnosis: {$diagnosis}) "
-               . "has been submitted and is pending coordinator review.";
-
+// --- Confirmation notification for doctor ---
 $stmt = $conn->prepare(
     "INSERT INTO notification (user_id, referral_id, message, notification_type, is_read, sent_at)
      VALUES (:uid, :rid, :msg, 'referral_submitted', 0, NOW())"
@@ -120,11 +145,28 @@ $stmt = $conn->prepare(
 $stmt->execute([
     ':uid' => $userId,
     ':rid' => $referralId,
-    ':msg' => $doctorMessage,
+    ':msg' => "Your referral for patient {$fullName} (Diagnosis: {$diagnosis}) has been submitted and is pending coordinator review.",
 ]);
 
-$_SESSION['success'] = "Referral for {$patientName} submitted successfully. "
-                     . "Your coordinator has been notified.";
+// --- Email patient if they provided one ---
+if ($patientEmail) {
+    $ObjSendMail->sendReferralNotification(
+        $patientEmail,
+        $fullName,
+        'Your Referral Has Been Submitted',
+        "Dear {$fullName},\n\nA referral has been created for you by {$_SESSION['full_name']} "
+        . "at {$_SESSION['hospital_name']}.\n\nDiagnosis: {$diagnosis}\nUrgency: {$urgencyLevel}\n\n"
+        . "You will be notified once the receiving hospital responds."
+    );
+}
+
+// --- Success message ---
+$_SESSION['success'] = "Referral for {$fullName} submitted successfully. Your coordinator has been notified.";
+
+if ($duplicateWarning) {
+    $_SESSION['success'] .= " ⚠️ Note: {$duplicateWarning}";
+}
+
 header('Location: doctor_dashboard.php');
 exit;
 ?>
