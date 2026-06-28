@@ -324,5 +324,48 @@ class Forms
         </form>
         <?php
     }
+    
+    /* ==============================================
+   CHANGE PASSWORD FORM
+============================================== */
+public function changePassword()
+{
+    ?>
+    <form action="change_password_process.php" method="post" class="refernet-form">
+
+        <h2>Create New Password</h2>
+
+        <div class="form-block">
+
+            <h3>First Time Setup</h3>
+
+            <p style="font-size:13px;color:#6b7280;margin-top:0;">
+                Your account has been verified.
+                Please create a new password before continuing.
+            </p>
+
+            <label>New Password</label>
+            <input
+                type="password"
+                name="new_password"
+                minlength="8"
+                required
+                placeholder="Enter a new password">
+
+            <label>Confirm Password</label>
+            <input
+                type="password"
+                name="confirm_password"
+                minlength="8"
+                required
+                placeholder="Confirm your new password">
+
+        </div>
+
+        <button type="submit">Save Password</button>
+
+    </form>
+    <?php
+}
 }
 ?>

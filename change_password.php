@@ -2,74 +2,39 @@
 session_start();
 require_once 'ClassAutoLoad.php';
 
-// Only accept POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: verify_otp.php');
-    exit;
-}
-
-// Must have a pending OTP session
-if (empty($_SESSION['otp_user_id'])) {
-    $_SESSION['error'] = 'Session expired. Please log in again.';
+// User must have verified OTP
+if (empty($_SESSION['change_password_user'])) {
+    $_SESSION['error'] = 'Please verify your account first.';
     header('Location: signin.php');
     exit;
 }
 
-$submittedOtp = trim($_POST['otp'] ?? '');
-$userId       = (int) $_SESSION['otp_user_id'];
+$Objlayout->header($conf);
+$Objlayout->nav($conf);
+?>
 
-// Basic validation
-if (!$submittedOtp || strlen($submittedOtp) !== 6 || !ctype_digit($submittedOtp)) {
-    $_SESSION['error'] = 'Please enter a valid 6-digit OTP.';
-    header('Location: verify_otp.php');
-    exit;
-}
+<section class="form-section">
 
-// Verify OTP
-$result = $ObjAuth->verifyOTP($userId, $submittedOtp);
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="error-box">
+            <?= htmlspecialchars($_SESSION['error']) ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
-if ($result !== true) {
-    // $result is an error message string
-    $_SESSION['error'] = $result;
-    header('Location: verify_otp.php');
-    exit;
-}
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="error-box" style="background:#dcfce7;color:#166534;">
+            <?= htmlspecialchars($_SESSION['success']) ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
 
-// OTP valid — fetch full user details BEFORE clearing temp session
-$userId = $userId; // already set above
+    <div class="form-card">
+        <?php $Objform->changePassword(); ?>
+    </div>
 
-// Clear temporary OTP session vars
-unset($_SESSION['otp_user_id']);
-unset($_SESSION['otp_full_name']);
-unset($_SESSION['otp_email']);
+</section>
 
-// Manually set user_id in session so currentUser() can find it
-$_SESSION['user_id'] = $userId;
-
-// Fetch full user details and create session
-$user = $ObjAuth->currentUser();
-
-if (!$user) {
-    $_SESSION['error'] = 'User not found. Please log in again.';
-    header('Location: signin.php');
-    exit;
-}
-
-// Clear temporary OTP session vars
-unset($_SESSION['otp_user_id']);
-unset($_SESSION['otp_full_name']);
-unset($_SESSION['otp_email']);
-
-// Create full login session
-$ObjAuth->createSession($user);
-
-// Force password change on first login
-if (empty($user['password_changed'])) {
-    header('Location: change_password.php');
-    exit;
-}
-
-// Redirect to dashboard
-header('Location: dashboard.php');
-exit;
+<?php
+$Objlayout->footer($conf);
 ?>

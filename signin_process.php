@@ -35,25 +35,35 @@ if (!$user) {
     exit;
 }
 
-// Credentials valid — generate OTP
-$otpCode = $ObjAuth->generateOTP($user['user_id']);
+// If this is the user's first login, require OTP
+if (empty($user['password_changed'])) {
 
-// Send OTP via PHPMailer
-$sent = $ObjSendMail->sendOTP($user['email'], $user['full_name'], $otpCode);
+    // Generate OTP
+    $otpCode = $ObjAuth->generateOTP($user['user_id']);
 
-if (!$sent) {
-    $_SESSION['error'] = 'Failed to send OTP email. Please try again or contact support.';
-    header('Location: signin.php');
+    // Send OTP
+    $sent = $ObjSendMail->sendOTP($user['email'], $user['full_name'], $otpCode);
+
+    if (!$sent) {
+        $_SESSION['error'] = 'Failed to send OTP email. Please try again or contact support.';
+        header('Location: signin.php');
+        exit;
+    }
+
+    // Store temporary session
+    $_SESSION['otp_user_id']   = $user['user_id'];
+    $_SESSION['otp_full_name'] = $user['full_name'];
+    $_SESSION['otp_email']     = $user['email'];
+
+    $_SESSION['success'] = 'A 6-digit OTP has been sent to ' . $user['email'] . '. It expires in 2 minutes.';
+
+    header('Location: verify_otp.php');
     exit;
 }
 
-// Store user_id in session temporarily (not fully logged in yet)
-$_SESSION['otp_user_id']   = $user['user_id'];
-$_SESSION['otp_full_name'] = $user['full_name'];
-$_SESSION['otp_email']     = $user['email'];
+// Existing user — log in directly (no OTP)
+$ObjAuth->createSession($user);
 
-// Redirect to OTP verification page
-$_SESSION['success'] = 'A 6-digit OTP has been sent to ' . $user['email'] . '. It expires in 2 minutes.';
-header('Location: verify_otp.php');
+header('Location: dashboard.php');
 exit;
 ?>

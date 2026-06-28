@@ -161,17 +161,21 @@ INSERT INTO hospital (hospital_name, county, level, location, email, phone) VALU
 ('Strathmore University Medical', 'Nairobi', 'Level 2', 'Madaraka, Nairobi',         'clinic@strathmore.edu', '+254 20 606 1000');
 
 -- Users  (passwords are bcrypt of 'password123' — change before go-live)
-INSERT INTO user (hospital_id, full_name, email, password, role, department, phone) VALUES
+INSERT INTO user (hospital_id, full_name, email, password,password_changed, role, department, phone) VALUES
 -- Doctors
-(5, 'Dr. John Mwangi',   'john.mwangi@strathmore.edu',  '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K', 'doctor',      'General Practice', '+254 711 000001'),
+(5, 'Dr. John Mwangi',   'john.mwangi@strathmore.edu',  '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K',  FALSE,'doctor',      'General Practice', '+254 711 000001'),
 
 -- Coordinators
-(5, 'Jane Wanjiku',      'jane.wanjiku@strathmore.edu', '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K', 'coordinator', 'Referral Desk',    '+254 722 000001'),
+(5, 'Jane Wanjiku',      'jane.wanjiku@strathmore.edu', '$2y$10$p5.NxByVu.xb.qHk8Bqrk.a9tB5tB67lGm7LjqgXmrnTs0Lv89o/K', FALSE, 'coordinator', 'Referral Desk',    '+254 722 000001'),
 
--- Sample Patients
-INSERT INTO patient (full_name, gender, date_of_birth, national_id, phone_number, address, current_ward) VALUES
-('Peter Kimani',   'Male',   '1979-03-15', '12345678', '+254 700 111 001', 'Westlands, Nairobi',  'General Ward'),
-('Mary Wanjiku',   'Female', '1990-07-22', '23456789', '+254 700 111 002', 'Kibera, Nairobi',     'Female Ward'),
-('James Ouma',     'Male',   '1985-11-10', '34567890', '+254 700 111 003', 'Eastleigh, Nairobi',  'General Ward'),
-('Grace Achieng',  'Female', '2001-05-03', '45678901', '+254 700 111 004', 'Karen, Nairobi',      'Maternity'),
-('Daniel Kipchoge','Male',   '1972-09-28', '56789012', '+254 700 111 005', 'Langata, Nairobi',    'ICU');
+
+
+
+
+NEW CHANGES
+
+
+//
+ALTER TABLE user
+ADD password_changed BOOLEAN NOT NULL DEFAULT FALSE;
+//

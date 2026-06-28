@@ -161,6 +161,26 @@ class Auth
     }
 
     /* ==============================================
+   Change password after first login
+============================================== */
+public function changePassword(int $userId, string $newPassword): bool
+{
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $stmt = $this->conn->prepare(
+        "UPDATE user
+         SET password = :password,
+             password_changed = 1
+         WHERE user_id = :id"
+    );
+
+    return $stmt->execute([
+        ':password' => $hashedPassword,
+        ':id'       => $userId
+    ]);
+}
+
+    /* ==============================================
        Destroy session (logout)
     =============================================== */
     public function logout(): void
