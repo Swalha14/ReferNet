@@ -16,7 +16,7 @@ if (empty($_SESSION['otp_user_id'])) {
 }
 
 $submittedOtp = trim($_POST['otp'] ?? '');
-$userId = (int) $_SESSION['otp_user_id'];
+$userId       = (int) $_SESSION['otp_user_id'];
 
 // Basic validation
 if (!$submittedOtp || strlen($submittedOtp) !== 6 || !ctype_digit($submittedOtp)) {
@@ -34,32 +34,32 @@ if ($result !== true) {
     exit;
 }
 
-// Temporarily set user_id so currentUser() can fetch the record
+// OTP valid — set user_id so currentUser() can fetch details
 $_SESSION['user_id'] = $userId;
-
-// Fetch user details
 $user = $ObjAuth->currentUser();
 
 if (!$user) {
-    unset($_SESSION['user_id']);
-
     $_SESSION['error'] = 'User not found. Please log in again.';
     header('Location: signin.php');
     exit;
 }
 
-// Clear OTP session variables
+// Clear temporary OTP session vars
 unset($_SESSION['otp_user_id']);
 unset($_SESSION['otp_full_name']);
 unset($_SESSION['otp_email']);
 
-// Store the user for the password change process
-$_SESSION['change_password_user'] = $user['user_id'];
+// First login — force password change
+if (empty($user['password_changed'])) {
+    // Store only the user_id for password change — not a full session
+    unset($_SESSION['user_id']);
+    $_SESSION['change_password_user'] = $userId;
+    header('Location: change_password.php');
+    exit;
+}
 
-// Remove temporary user_id session
-unset($_SESSION['user_id']);
-
-// Redirect to change password page
-header('Location: change_password.php');
+// Password already set — create full session and go to dashboard
+$ObjAuth->createSession($user);
+header('Location: dashboard.php');
 exit;
 ?>
