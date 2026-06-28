@@ -2,15 +2,13 @@
 session_start();
 require_once '../ClassAutoLoad.php';
 
-// Guard
 $ObjAuth->requireLogin();
 $ObjAuth->requireRole('doctor');
 
 $conn       = $SQL->getConnection();
-$userId     = $_SESSION['user_id'];
 $hospitalId = $_SESSION['hospital_id'];
 
-// Fetch all hospitals except the doctor's own hospital (can't refer to yourself)
+// Fetch all hospitals except the doctor's own
 $stmt = $conn->prepare(
     "SELECT hospital_id, hospital_name, level
      FROM hospital
@@ -19,15 +17,6 @@ $stmt = $conn->prepare(
 );
 $stmt->execute([':hid' => $hospitalId]);
 $hospitals = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all patients
-$stmt = $conn->prepare(
-    "SELECT patient_id, full_name, national_id, gender, date_of_birth
-     FROM patient
-     ORDER BY full_name"
-);
-$stmt->execute();
-$patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $Objlayout->header($conf, '../');
 ?>
@@ -39,78 +28,56 @@ $Objlayout->header($conf, '../');
         <div style="font-size:18px;font-weight:bold;margin-bottom:5px;">
             <?= htmlspecialchars($conf['site_name']) ?>
         </div>
-        <div style="font-size:12px;opacity:0.75;margin-bottom:30px;">
-            Hospital Referral System
-        </div>
-
+        <div style="font-size:12px;opacity:0.75;margin-bottom:30px;">Hospital Referral System</div>
         <nav>
             <ul style="list-style:none;padding:0;margin:0;">
                 <li style="margin-bottom:8px;">
                     <a href="doctor_dashboard.php"
-                       style="color:white;text-decoration:none;display:block;
-                              padding:10px 14px;border-radius:8px;">
+                       style="color:white;text-decoration:none;display:block;padding:10px 14px;border-radius:8px;">
                         📊 Dashboard
                     </a>
                 </li>
                 <li style="margin-bottom:8px;">
                     <a href="create_referral.php"
-                       style="color:white;text-decoration:none;display:block;
-                              padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.15);">
+                       style="color:white;text-decoration:none;display:block;padding:10px 14px;
+                              border-radius:8px;background:rgba(255,255,255,0.15);">
                         ➕ Create Referral
                     </a>
                 </li>
                 <li style="margin-bottom:8px;">
                     <a href="view_referrals.php"
-                       style="color:white;text-decoration:none;display:block;
-                              padding:10px 14px;border-radius:8px;">
+                       style="color:white;text-decoration:none;display:block;padding:10px 14px;border-radius:8px;">
                         📋 My Referrals
                     </a>
                 </li>
                 <li style="margin-bottom:8px;">
                     <a href="notifications.php"
-                       style="color:white;text-decoration:none;display:block;
-                              padding:10px 14px;border-radius:8px;">
+                       style="color:white;text-decoration:none;display:block;padding:10px 14px;border-radius:8px;">
                         🔔 Notifications
                     </a>
                 </li>
             </ul>
         </nav>
-
         <div style="padding-top:40px;border-top:1px solid rgba(255,255,255,0.2);margin-top:60px;">
-            <div style="font-size:13px;font-weight:bold;">
-                <?= htmlspecialchars($_SESSION['full_name']) ?>
-            </div>
-            <div style="font-size:11px;opacity:0.75;">
-                <?= htmlspecialchars($_SESSION['hospital_name']) ?>
-            </div>
-            <div style="font-size:11px;opacity:0.75;margin-bottom:12px;">
-                <?= htmlspecialchars($_SESSION['department']) ?>
-            </div>
+            <div style="font-size:13px;font-weight:bold;"><?= htmlspecialchars($_SESSION['full_name']) ?></div>
+            <div style="font-size:11px;opacity:0.75;"><?= htmlspecialchars($_SESSION['hospital_name']) ?></div>
+            <div style="font-size:11px;opacity:0.75;margin-bottom:12px;"><?= htmlspecialchars($_SESSION['department']) ?></div>
             <a href="../signout.php"
-               style="
-                    display:block;
-                    margin-top:18px;
-                    padding:12px;
-                    background:#dc2626;
-                    color:white;
-                    text-align:center;
-                    text-decoration:none;
-                    border-radius:8px;
-                    font-weight:bold;
-                    font-size:15px;
-                    box-shadow:0 2px 6px rgba(0,0,0,.2);">
+               style="display:block;margin-top:18px;padding:12px;background:#dc2626;
+                      color:white;text-align:center;text-decoration:none;border-radius:8px;
+                      font-weight:bold;font-size:15px;">
                 🚪 Logout
             </a>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main style="flex:1;padding:30px;background:#f4f6fb;">
 
         <div style="margin-bottom:25px;">
             <h1 style="margin:0;font-size:22px;color:#1f2937;">Create New Referral</h1>
             <p style="margin:4px 0 0;color:#6b7280;font-size:13px;">
-                Complete all required fields and submit for coordinator review.
+                Fill in patient details and clinical information, then submit for coordinator review.
             </p>
         </div>
 
@@ -127,41 +94,100 @@ $Objlayout->header($conf, '../');
             <!-- LEFT COLUMN -->
             <div>
 
-                <!-- Patient Information -->
+                <!-- Patient Details -->
                 <div style="background:white;border-radius:12px;padding:24px;
                             box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:20px;
                             border-left:4px solid #3b82f6;">
                     <h3 style="margin:0 0 16px;color:#1d4ed8;font-size:15px;">
-                        Patient Information
+                        👤 Patient Details
                     </h3>
 
-                    <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
-                        Select Patient <span style="color:#ef4444;">*</span>
-                    </label>
-                    <select name="patient_id" required id="patient-select"
-                            style="width:100%;padding:10px;border-radius:8px;
-                                   border:1px solid #d1d5db;margin-bottom:12px;">
-                        <option value="">-- Select patient --</option>
-                        <?php foreach ($patients as $p): ?>
-                            <option value="<?= $p['patient_id'] ?>"
-                                    data-name="<?= htmlspecialchars($p['full_name']) ?>"
-                                    data-id="<?= htmlspecialchars($p['national_id']) ?>"
-                                    data-gender="<?= htmlspecialchars($p['gender']) ?>"
-                                    data-dob="<?= htmlspecialchars($p['date_of_birth']) ?>">
-                                <?= htmlspecialchars($p['full_name']) ?>
-                                — <?= htmlspecialchars($p['national_id']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
 
-                    <!-- Patient details auto-fill -->
-                    <div id="patient-details"
-                         style="display:none;background:#eff6ff;border-radius:8px;
-                                padding:12px;font-size:13px;color:#374151;">
-                        <strong>Name:</strong> <span id="pd-name"></span> &nbsp;|&nbsp;
-                        <strong>ID:</strong> <span id="pd-id"></span> &nbsp;|&nbsp;
-                        <strong>Gender:</strong> <span id="pd-gender"></span> &nbsp;|&nbsp;
-                        <strong>DOB:</strong> <span id="pd-dob"></span>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Full Name <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="text" name="full_name" required
+                                   placeholder="e.g. John Kamau"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                National ID <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="text" name="national_id" required
+                                   placeholder="e.g. 12345678"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Gender <span style="color:#ef4444;">*</span>
+                            </label>
+                            <select name="gender" required
+                                    style="width:100%;padding:10px;border-radius:8px;
+                                           border:1px solid #d1d5db;box-sizing:border-box;">
+                                <option value="">-- Select gender --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Date of Birth <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="date" name="date_of_birth" required
+                                   max="<?= date('Y-m-d') ?>"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Phone Number
+                            </label>
+                            <input type="text" name="phone_number"
+                                   placeholder="e.g. +254 700 000 000"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Email (optional)
+                            </label>
+                            <input type="email" name="patient_email"
+                                   placeholder="patient@email.com"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Current Ward
+                            </label>
+                            <input type="text" name="current_ward"
+                                   placeholder="e.g. General Ward, ICU"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
+                                Address
+                            </label>
+                            <input type="text" name="address"
+                                   placeholder="e.g. Westlands, Nairobi"
+                                   style="width:100%;padding:10px;border-radius:8px;
+                                          border:1px solid #d1d5db;box-sizing:border-box;">
+                        </div>
+
                     </div>
                 </div>
 
@@ -170,15 +196,13 @@ $Objlayout->header($conf, '../');
                             box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:20px;
                             border-left:4px solid #8b5cf6;">
                     <h3 style="margin:0 0 16px;color:#7c3aed;font-size:15px;">
-                        Receiving Hospital
+                        🏥 Receiving Hospital
                     </h3>
-
                     <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
                         Select Receiving Hospital <span style="color:#ef4444;">*</span>
                     </label>
                     <select name="receiving_hospital_id" required
-                            style="width:100%;padding:10px;border-radius:8px;
-                                   border:1px solid #d1d5db;">
+                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;">
                         <option value="">-- Select hospital --</option>
                         <?php foreach ($hospitals as $h): ?>
                             <option value="<?= $h['hospital_id'] ?>">
@@ -194,10 +218,10 @@ $Objlayout->header($conf, '../');
                             box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:20px;
                             border-left:4px solid #10b981;">
                     <h3 style="margin:0 0 16px;color:#059669;font-size:15px;">
-                        Clinical Information
+                        🩺 Clinical Information
                     </h3>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                         <div>
                             <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:5px;">
                                 Primary Diagnosis <span style="color:#ef4444;">*</span>
@@ -212,8 +236,7 @@ $Objlayout->header($conf, '../');
                                 Urgency Level <span style="color:#ef4444;">*</span>
                             </label>
                             <select name="urgency_level" required
-                                    style="width:100%;padding:10px;border-radius:8px;
-                                           border:1px solid #d1d5db;">
+                                    style="width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;">
                                 <option value="">-- Select urgency --</option>
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
@@ -266,13 +289,11 @@ $Objlayout->header($conf, '../');
 
             </div>
 
-            <!-- RIGHT COLUMN — Referral Summary -->
+            <!-- RIGHT COLUMN — Summary -->
             <div>
                 <div style="background:white;border-radius:12px;padding:24px;
                             box-shadow:0 2px 8px rgba(0,0,0,0.07);position:sticky;top:20px;">
-                    <h3 style="margin:0 0 16px;color:#1f2937;font-size:15px;">
-                        📋 Referral Summary
-                    </h3>
+                    <h3 style="margin:0 0 16px;color:#1f2937;font-size:15px;">📋 Referral Summary</h3>
 
                     <div style="font-size:13px;color:#374151;line-height:2;">
                         <div><strong>Referring Doctor:</strong><br>
@@ -301,12 +322,10 @@ $Objlayout->header($conf, '../');
                         </span>
                     </div>
 
-                    <!-- Submit Buttons -->
                     <button type="submit"
-                            style="width:100%;margin-top:24px;padding:12px;
-                                   background:#1d4ed8;color:white;border:none;
-                                   border-radius:10px;font-weight:bold;font-size:14px;
-                                   cursor:pointer;">
+                            style="width:100%;margin-top:24px;padding:12px;background:#1d4ed8;
+                                   color:white;border:none;border-radius:10px;font-weight:bold;
+                                   font-size:14px;cursor:pointer;">
                         Submit Referral
                     </button>
 
@@ -323,23 +342,5 @@ $Objlayout->header($conf, '../');
 
     </main>
 </div>
-
-<!-- Auto-fill patient details on select -->
-<script>
-    document.getElementById('patient-select').addEventListener('change', function () {
-        var opt     = this.options[this.selectedIndex];
-        var details = document.getElementById('patient-details');
-
-        if (this.value) {
-            document.getElementById('pd-name').textContent   = opt.dataset.name;
-            document.getElementById('pd-id').textContent     = opt.dataset.id;
-            document.getElementById('pd-gender').textContent = opt.dataset.gender;
-            document.getElementById('pd-dob').textContent    = opt.dataset.dob;
-            details.style.display = 'block';
-        } else {
-            details.style.display = 'none';
-        }
-    });
-</script>
 
 <?php $Objlayout->footer($conf); ?>
