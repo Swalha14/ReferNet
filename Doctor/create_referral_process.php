@@ -101,7 +101,7 @@ $stmt = $conn->prepare(
         :patient_id, :doctor_id, :sending_hid, :receiving_hid,
         :diagnosis, :referral_reason, :urgency_level,
         :exam_findings, :treatment, :clinical_summary,
-        'Pending Validation', NOW()
+        'Submitted', NOW()
     )"
 );
 $stmt->execute([
@@ -127,16 +127,37 @@ $stmt->execute([':hid' => $hospitalId]);
 $coordinators = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($coordinators as $coord) {
+
     $message = "New referral submitted by {$_SESSION['full_name']} for patient {$fullName}. "
              . "Diagnosis: {$diagnosis}. Urgency: {$urgencyLevel}. Please review.";
 
+    // In-system notification
     $stmt = $conn->prepare(
         "INSERT INTO notification (user_id, referral_id, message, notification_type, is_read, sent_at)
          VALUES (:uid, :rid, :msg, 'new_referral', 0, NOW())"
     );
-    $stmt->execute([':uid' => $coord['user_id'], ':rid' => $referralId, ':msg' => $message]);
-}
 
+    $stmt->execute([
+        ':uid' => $coord['user_id'],
+        ':rid' => $referralId,
+        ':msg' => $message
+    ]);
+
+    // Email notification
+    $ObjSendMail->sendReferralNotification(
+        $coord['email'],
+        $coord['full_name'],
+        'New Referral Awaiting Review',
+        "Dear {$coord['full_name']},\n\n"
+        . "A new referral has been submitted by Dr. {$_SESSION['full_name']} "
+        . "at {$_SESSION['hospital_name']} and is awaiting your review.\n\n"
+        . "Patient: {$fullName}\n"
+        . "Diagnosis: {$diagnosis}\n"
+        . "Urgency: {$urgencyLevel}\n\n"
+        . "Please log in to ReferNet to review and forward the referral."
+    );
+
+}
 // --- Confirmation notification for doctor ---
 $stmt = $conn->prepare(
     "INSERT INTO notification (user_id, referral_id, message, notification_type, is_read, sent_at)
@@ -161,7 +182,7 @@ if ($patientEmail) {
 }
 
 // --- Success message ---
-$_SESSION['success'] = "Referral for {$fullName} submitted successfully. Your coordinator has been notified.";
+$_SESSION['success'] = "Referral for {$fullName} submitted successfully and is awaiting review by your hospital's Referral Coordinator.";
 
 if ($duplicateWarning) {
     $_SESSION['success'] .= " ⚠️ Note: {$duplicateWarning}";

@@ -318,7 +318,7 @@ $Objlayout->header($conf, '../');
                         </div>
                         <span style="background:#f59e0b;color:white;padding:4px 12px;
                                      border-radius:20px;font-size:12px;font-weight:bold;">
-                            Pending Validation
+                            Submitted
                         </span>
                     </div>
 

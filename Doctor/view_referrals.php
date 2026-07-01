@@ -156,7 +156,7 @@ $Objlayout->header($conf, '../');
         <!-- Status Filter Tabs -->
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
             <?php
-            $tabs = ['All', 'Pending Validation', 'Submitted', 'Approved', 'Rejected', 'Scheduled', 'Completed'];
+            $tabs = ['All', 'Submitted','Pending Validation', 'Approved', 'Rejected', 'Scheduled', 'Completed'];
             foreach ($tabs as $tab):
                 $val      = $tab === 'All' ? '' : $tab;
                 $isActive = $statusFilter === $val;

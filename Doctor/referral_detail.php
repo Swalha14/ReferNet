@@ -39,6 +39,23 @@ $stmt = $conn->prepare(
 $stmt->execute([':rid' => $referralId, ':uid' => $userId]);
 $r = $stmt->fetch(PDO::FETCH_ASSOC);
 
+//fetch the coordinator of the sending hospital
+$stmt = $conn->prepare("
+    SELECT full_name
+    FROM user
+    WHERE hospital_id = :hid
+      AND role = 'coordinator'
+      AND is_active = 1
+    LIMIT 1
+");
+$stmt->execute([
+    ':hid' => $r['sending_hospital_id']
+]);
+
+$hospitalCoordinator = $stmt->fetchColumn();
+
+
+
 if (!$r) {
     $_SESSION['error'] = 'Referral not found or access denied.';
     header('Location: view_referrals.php');
@@ -82,13 +99,14 @@ function urgencyBadge(string $urgency): string {
 
 // Status timeline steps
 $steps = [
-    'Pending Validation' => 1,
-    'Submitted'          => 2,
+    'Submitted'          => 1,
+    'Pending Validation' => 2,
     'Approved'           => 3,
     'Rejected'           => 3,
     'Scheduled'          => 4,
     'Completed'          => 5,
 ];
+
 $currentStep = $steps[$r['status']] ?? 1;
 
 $Objlayout->header($conf, '../');
@@ -171,12 +189,12 @@ $Objlayout->header($conf, '../');
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <?php
                 $timelineSteps = [
-                    1 => 'Pending Validation',
-                    2 => 'Submitted',
-                    3 => $r['status'] === 'Rejected' ? 'Rejected' : 'Approved',
-                    4 => 'Scheduled',
-                    5 => 'Completed',
-                ];
+                          1 => 'Submitted',
+                         2 => 'Pending Validation',
+                        3 => $r['status'] === 'Rejected' ? 'Rejected' : 'Approved',
+                         4 => 'Scheduled',
+                         5 => 'Completed',
+                                 ];
                 $isRejected = $r['status'] === 'Rejected';
 
                 foreach ($timelineSteps as $num => $label):
@@ -245,8 +263,7 @@ $Objlayout->header($conf, '../');
                     'Department'         => $r['department'],
                     'Sending Hospital'   => $r['sending_hospital'],
                     'Receiving Hospital' => $r['receiving_hospital'],
-                    'Referring Coord'    => $r['referring_coord_name'] ?? 'Not yet assigned',
-                    'Receiving Coord'    => $r['receiving_coord_name'] ?? 'Not yet assigned',
+                   'Referring Coord' =>$r['referring_coord_name']?: ($hospitalCoordinator ?: 'Not Assigned'),
                     'Decision Date'      => $r['decision_date'] ? date('d M Y', strtotime($r['decision_date'])) : '—',
                 ];
                 foreach ($fields as $label => $value): ?>
