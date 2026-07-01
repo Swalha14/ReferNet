@@ -110,7 +110,22 @@ $Objlayout->header($conf, '../');
             <div style="font-size:13px;font-weight:bold;"><?= htmlspecialchars($_SESSION['full_name']) ?></div>
             <div style="font-size:11px;opacity:0.75;"><?= htmlspecialchars($_SESSION['hospital_name']) ?></div>
             <div style="font-size:11px;opacity:0.75;margin-bottom:12px;"><?= htmlspecialchars($_SESSION['department']) ?></div>
-            <a href="../signout.php" style="color:#bfdbfe;font-size:12px;text-decoration:none;">🚪 Logout</a>
+            <div>
+            <a href="../signout.php"
+               style="
+                    display:block;
+                    margin-top:18px;
+                    padding:12px;
+                    background:#dc2626;
+                    color:white;
+                    text-align:center;
+                    text-decoration:none;
+                    border-radius:8px;
+                    font-weight:bold;
+                    font-size:15px;
+                    box-shadow:0 2px 6px rgba(0,0,0,.2);">
+                🚪 Logout
+            </a>
         </div>
     </aside>
 
