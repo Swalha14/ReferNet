@@ -10,7 +10,7 @@ $userId = $_SESSION['user_id'];
 
 // Filter by status if provided
 $statusFilter = trim($_GET['status'] ?? '');
-$validStatuses = ['Pending Validation','Submitted','Approved','Rejected','Scheduled','Completed'];
+$validStatuses = ['Pending Validation','Awaiting Review','Approved','Rejected','Scheduled','Completed'];
 
 $whereStatus = '';
 $params      = [':uid' => $userId];
@@ -42,7 +42,7 @@ $referrals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 function statusBadge(string $status): string {
     $colours = [
         'Pending Validation' => '#f59e0b',
-        'Submitted'          => '#3b82f6',
+        'Awaiting Review'    => '#3b82f6',
         'Approved'           => '#10b981',
         'Rejected'           => '#ef4444',
         'Scheduled'          => '#8b5cf6',
@@ -156,7 +156,7 @@ $Objlayout->header($conf, '../');
         <!-- Status Filter Tabs -->
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
             <?php
-            $tabs = ['All', 'Submitted','Pending Validation', 'Approved', 'Rejected', 'Scheduled', 'Completed'];
+            $tabs = ['All', 'Awaiting Review','Pending Validation', 'Approved', 'Rejected', 'Scheduled', 'Completed'];
             foreach ($tabs as $tab):
                 $val      = $tab === 'All' ? '' : $tab;
                 $isActive = $statusFilter === $val;

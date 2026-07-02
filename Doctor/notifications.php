@@ -154,7 +154,7 @@ $Objlayout->header($conf, '../');
                                         <?php
                                         $sColours = [
                                             'Pending Validation' => '#f59e0b',
-                                            'Submitted'          => '#3b82f6',
+                                            'Awaiting Review'    => '#3b82f6',
                                             'Approved'           => '#10b981',
                                             'Rejected'           => '#ef4444',
                                             'Scheduled'          => '#8b5cf6',

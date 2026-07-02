@@ -50,7 +50,7 @@ $stmt = $conn->prepare("
     SELECT COUNT(*)
     FROM referral
     WHERE sending_hospital_id = :hid
-      AND status = 'Submitted'
+      AND status = 'Awaiting Review'
 ");
 $stmt->execute([':hid' => $hospitalId]);
 $pendingReferrals = $stmt->fetchColumn();

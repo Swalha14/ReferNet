@@ -101,7 +101,7 @@ $stmt = $conn->prepare(
         :patient_id, :doctor_id, :sending_hid, :receiving_hid,
         :diagnosis, :referral_reason, :urgency_level,
         :exam_findings, :treatment, :clinical_summary,
-        'Submitted', NOW()
+        'Awaiting Review', NOW()
     )"
 );
 $stmt->execute([

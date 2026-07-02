@@ -179,3 +179,17 @@ NEW CHANGES
 ALTER TABLE user
 ADD password_changed BOOLEAN NOT NULL DEFAULT FALSE;
 //
+
+//
+
+ALTER TABLE referral
+MODIFY status ENUM(
+    'Pending Validation',
+    'Awaiting Review',
+    'Approved',
+    'Rejected',
+    'Scheduled',
+    'Completed'
+) NOT NULL DEFAULT 'Pending Validation';
+
+//

@@ -1,0 +1,329 @@
+/* ===========================
+   Layout
+=========================== */
+
+body {
+    margin:0;
+    background:#f4f6fb;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.coord-layout{
+    display:flex;
+    min-height:100vh;
+}
+
+/* ===========================
+   Sidebar
+=========================== */
+
+.sidebar{
+    width:240px;
+    background:#1d4ed8;
+    color:#fff;
+    padding:30px 20px;
+    display:flex;
+    flex-direction:column;
+    flex-shrink:0;
+}
+
+.logo{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    font-size:12px;
+    opacity:.75;
+    margin-bottom:30px;
+}
+
+.sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.sidebar li{
+    margin-bottom:8px;
+}
+
+.sidebar a{
+    display:block;
+    padding:10px 14px;
+    color:#fff;
+    text-decoration:none;
+    border-radius:8px;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:rgba(255,255,255,.12);
+}
+
+.sidebar a.active{
+    background:rgba(255,255,255,.18);
+}
+
+.sidebar-footer{
+    margin-top:auto;
+    padding-top:35px;
+    border-top:1px solid rgba(255,255,255,.2);
+}
+
+.user-name{
+    font-size:13px;
+    font-weight:bold;
+}
+
+.hospital-name,
+.user-role{
+    font-size:11px;
+    opacity:.75;
+    margin-top:3px;
+}
+
+.btn-logout{
+    display:block;
+    margin-top:18px;
+    background:#dc2626;
+    color:#fff;
+    text-align:center;
+    padding:12px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.btn-logout:hover{
+    background:#b91c1c;
+}
+
+/* ===========================
+   Sidebar Badges
+=========================== */
+
+.badge-warning,
+.badge-danger{
+    float:right;
+    padding:2px 7px;
+    border-radius:50%;
+    color:#fff;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.badge-warning{
+    background:#f59e0b;
+}
+
+.badge-danger{
+    background:#ef4444;
+}
+
+/* ===========================
+   Main Content
+=========================== */
+
+.main-content{
+    flex:1;
+    padding:30px;
+}
+
+.page-header{
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    margin:0;
+    color:#1f2937;
+    font-size:24px;
+}
+
+.page-header p{
+    margin-top:6px;
+    color:#6b7280;
+}
+
+/* ===========================
+   Alerts
+=========================== */
+
+.alert-success{
+    background:#dcfce7;
+    color:#166534;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+.alert-error{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+/* ===========================
+   Card
+=========================== */
+
+.card{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.card-header h3{
+    margin:0;
+    color:#1f2937;
+}
+
+.pending-pill{
+    background:#eff6ff;
+    color:#2563eb;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* ===========================
+   Empty State
+=========================== */
+
+.empty-state{
+    text-align:center;
+    color:#9ca3af;
+    padding:50px;
+}
+
+/* ===========================
+   Table
+=========================== */
+
+.referral-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+.referral-table thead tr{
+    background:#f9fafb;
+    border-bottom:2px solid #e5e7eb;
+}
+
+.referral-table th{
+    text-align:left;
+    padding:12px;
+}
+
+.referral-table td{
+    padding:12px;
+    border-bottom:1px solid #f3f4f6;
+}
+
+.actions{
+    text-align:center;
+    white-space:nowrap;
+}
+
+/* ===========================
+   View Button
+=========================== */
+
+.btn-view{
+    display:inline-block;
+    background:#2563eb;
+    color:#fff;
+    text-decoration:none;
+    padding:8px 14px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.btn-view:hover{
+    background:#1d4ed8;
+}
+
+/* ===========================
+   Status Badges
+=========================== */
+
+.status-badge{
+    display:inline-block;
+    min-width:130px;
+    text-align:center;
+    padding:6px 12px;
+    border-radius:999px;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.status-awaiting{
+    background:#2563eb;
+}
+
+.status-validation{
+    background:#f59e0b;
+}
+
+.status-approved{
+    background:#10b981;
+}
+
+.status-rejected{
+    background:#ef4444;
+}
+
+.status-scheduled{
+    background:#8b5cf6;
+}
+
+.status-completed{
+    background:#6b7280;
+}
+
+/* ===========================
+   Urgency Badges
+=========================== */
+
+.urgency-badge{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    color:#fff;
+    font-size:12px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+.urgency-low{
+    background:#10b981;
+}
+
+.urgency-medium{
+    background:#f59e0b;
+}
+
+.urgency-high{
+    background:#ef4444;
+}
+
+.urgency-critical{
+    background:#7f1d1d;
+}
+

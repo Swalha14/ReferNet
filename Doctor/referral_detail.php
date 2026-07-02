@@ -73,7 +73,7 @@ $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
 function statusBadge(string $status): string {
     $colours = [
         'Pending Validation' => '#f59e0b',
-        'Submitted'          => '#3b82f6',
+        'Awaiting Review'    => '#3b82f6',
         'Approved'           => '#10b981',
         'Rejected'           => '#ef4444',
         'Scheduled'          => '#8b5cf6',
@@ -99,7 +99,7 @@ function urgencyBadge(string $urgency): string {
 
 // Status timeline steps
 $steps = [
-    'Submitted'          => 1,
+    'Awaiting Review'    => 1,
     'Pending Validation' => 2,
     'Approved'           => 3,
     'Rejected'           => 3,
@@ -189,7 +189,7 @@ $Objlayout->header($conf, '../');
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <?php
                 $timelineSteps = [
-                          1 => 'Submitted',
+                          1 => 'Awaiting Review',
                          2 => 'Pending Validation',
                         3 => $r['status'] === 'Rejected' ? 'Rejected' : 'Approved',
                          4 => 'Scheduled',
