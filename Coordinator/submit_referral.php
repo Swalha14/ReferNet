@@ -102,6 +102,7 @@ try {
         status = 'Pending Validation',
         referring_coordinator_id = :coord
     WHERE referral_id = :rid
+    AND status = 'Awaiting Review'
     ");
 
     $stmt->execute([

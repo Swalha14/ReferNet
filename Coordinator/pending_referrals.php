@@ -145,7 +145,7 @@ $Objlayout->header($conf,'../');
                 </li>
 
                 <li>
-                    <a href="notifications.php">
+                    <a href="coord_notifications.php">
                         🔔 Notifications
 
                         <?php if($unreadCount>0): ?>

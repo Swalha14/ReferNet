@@ -278,8 +278,7 @@ $Objlayout->header($conf, '../');
             </div>
 
             <!-- Clinical Information -->
-            <div style="background:white;border-radius:12px;padding:20px;
-                        box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+            <div style="grid-column:1 / span 2;background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.07);">
                 <h3 style="margin:0 0 14px;font-size:14px;color:#059669;border-bottom:2px solid #f0fdf4;padding-bottom:8px;">
                     🩺 Clinical Information
                 </h3>
@@ -301,55 +300,7 @@ $Objlayout->header($conf, '../');
                 <?php endforeach; ?>
             </div>
 
-            <!-- Right column: Rejection notes + Appointment -->
-            <div>
-
-                <?php if ($r['status'] === 'Rejected' && $r['review_notes']): ?>
-                    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;
-                                padding:20px;margin-bottom:20px;">
-                        <h3 style="margin:0 0 10px;font-size:14px;color:#991b1b;">
-                            ❌ Rejection Reason
-                        </h3>
-                        <p style="margin:0;font-size:13px;color:#7f1d1d;">
-                            <?= nl2br(htmlspecialchars($r['review_notes'])) ?>
-                        </p>
-                    </div>
-                <?php endif; ?>
-
-                <?php if ($appointment): ?>
-                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;">
-                        <h3 style="margin:0 0 14px;font-size:14px;color:#059669;">
-                            📅 Appointment Details
-                        </h3>
-                        <?php
-                        $apptFields = [
-                            'Date'       => date('d M Y', strtotime($appointment['appointment_date'])),
-                            'Time'       => date('H:i', strtotime($appointment['appointment_time'])),
-                            'Department' => $appointment['department'] ?? '—',
-                            'Status'     => $appointment['status'],
-                            'Notes'      => $appointment['notes'] ?? '—',
-                        ];
-                        foreach ($apptFields as $label => $value): ?>
-                            <div style="display:flex;justify-content:space-between;
-                                        padding:6px 0;border-bottom:1px solid #dcfce7;font-size:13px;">
-                                <span style="color:#6b7280;"><?= $label ?></span>
-                                <span style="font-weight:bold;color:#1f2937;">
-                                    <?= htmlspecialchars($value) ?>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php elseif (in_array($r['status'], ['Approved', 'Scheduled', 'Completed'])): ?>
-                    <div style="background:#eff6ff;border-radius:12px;padding:20px;
-                                font-size:13px;color:#1d4ed8;text-align:center;">
-                        📅 Appointment details will appear here once scheduled.
-                    </div>
-                <?php endif; ?>
-
-            </div>
-
         </div>
-
     </main>
 </div>
 

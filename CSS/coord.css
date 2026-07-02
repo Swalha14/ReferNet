@@ -327,3 +327,26 @@ body {
     background:#7f1d1d;
 }
 
+.filter-bar{
+display:flex;
+gap:12px;
+margin-bottom:20px;
+flex-wrap:wrap;
+}
+
+.filter-input{
+flex:1;
+min-width:240px;
+padding:10px 12px;
+border:1px solid #d1d5db;
+border-radius:8px;
+font-size:13px;
+}
+
+.filter-select{
+padding:10px 12px;
+border:1px solid #d1d5db;
+border-radius:8px;
+font-size:13px;
+background:#fff;
+}

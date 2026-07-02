@@ -189,7 +189,7 @@ $Objlayout->header($conf, '../');
                 </li>
 
                 <li style="margin-bottom:8px;">
-                    <a href="notifications.php"
+                    <a href="coord_notifications.php"
                        style="color:white;text-decoration:none;display:block;padding:10px 14px;border-radius:8px;">
                         🔔 Notifications
                         <?php if ($unreadCount > 0): ?>
